@@ -1,0 +1,13 @@
+navigation
+npm install @react-navigation/stack
+
+Expo sqlite
+npm expo install expo-sqlite
+
+
+modal datatime
+npm install react-native-modal-datetime-picker
+
+
+dateFns (formato da data)
+npm install date-fns
