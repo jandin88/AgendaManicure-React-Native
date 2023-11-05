@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, Button, TextInput,    } from 'react-native';
+import { View, Text, Button, TextInput, StyleSheet} from 'react-native';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { format } from 'date-fns';
-import * as SQLite from 'expo-sqlite';
+import {insertServiceRecord} from '../db/db'
 
 const CadastroCliente = () => {
   const [nome, setNome] = useState('');
@@ -14,6 +14,7 @@ const CadastroCliente = () => {
   const formattedDate = selectedDate
     ? format(selectedDate, 'HH:mm dd/MM/yyyy')
     : '';
+
 
   const showDateTimePicker = () => {
     setDateTimePickerVisibility(true);
@@ -29,35 +30,23 @@ const CadastroCliente = () => {
   };
 
   const handleCadastro = () => {
-    check =  nome !== '' || telefone !== '' || service !== '' || selectedDate !== null
-    if (check) {
+   check =  nome !== ''&& telefone !== ''&& service !== ''&& formattedDate !== ''
+     if (check) {
+      insertServiceRecord(nome, telefone, service, formattedDate)
+      console.log(selectedDate)
       setMsgError('')
-      const db = SQLite.openDatabase('service.db');
-
-      db.transaction(tx => {
-
-        tx.executeSql(
-          'INSERT INTO serviceRecord(name, phone, service, date) VALUES (?, ?, ?, ?)',
-          [nome, telefone, service, formattedDate],
-          (_, result) => {
-            console.log('Data inserted successfully', result);
-          },
-          (error) => {
-            console.log('Error inserting data:', error);
-          }
-        );
-      });
-
+      
+    
       console.log("Nome:", nome);
       console.log("Telefone:", telefone);
       console.log("Observação:", service);
       console.log("Data e Hora Selecionadas:", formattedDate);
     }else{
       setMsgError("Digite todos os dados")
-    }
+    
   };
 
-
+  }
   return (
     <View style={styles.container}>
 
