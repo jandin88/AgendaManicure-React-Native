@@ -1,20 +1,23 @@
-import React, { useState } from 'react';
-import { View, Text, Button, TextInput, StyleSheet} from 'react-native';
+import React, { useState } from "react";
+import { View, Text, Button, TextInput, StyleSheet } from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { format } from 'date-fns';
-import {insertServiceRecord} from '../db/db'
+import { format } from "date-fns";
+import { atualizarServiceRecord } from "../db/db";
 
-const CadastroCliente = ({ navigation }) => {
-  const [nome, setNome] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [service, setService] = useState('');
-  const [isDateTimePickerVisible, setDateTimePickerVisibility] = useState(false);
+import { AntDesign } from "@expo/vector-icons"; 
+
+const ReviwDetails = ({ navigation, route }) => {
+  const [id, setId] = useState(route.params.id);
+  const [nome, setNome] = useState(route.params.name);
+  const [telefone, setTelefone] = useState(route.params.phone);
+  const [service, setService] = useState(route.params.service);
+  const [isDateTimePickerVisible, setDateTimePickerVisibility] =
+    useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [msgError, setMsgError] = useState('')
+  const [msgError, setMsgError] = useState("");
   const formattedDate = selectedDate
-    ? format(selectedDate, 'HH:mm dd/MM/yyyy')
-    : '';
-
+    ? format(selectedDate, "HH:mm dd/MM/yyyy")
+    : route.params.date;
 
   const showDateTimePicker = () => {
     setDateTimePickerVisibility(true);
@@ -30,30 +33,35 @@ const CadastroCliente = ({ navigation }) => {
   };
 
   const handleCadastro = () => {
-   check =  nome !== ''&& telefone !== ''&& service !== ''&& formattedDate !== ''
-     if (check) {
-      insertServiceRecord(nome, telefone, service, formattedDate)
-      console.log(selectedDate)
-      setMsgError('')
-      
-    
+    check =
+      nome !== "" && telefone !== "" && service !== "" && formattedDate !== "";
+    if (check) {
+      console.log("id:", id);
       console.log("Nome:", nome);
       console.log("Telefone:", telefone);
       console.log("Observação:", service);
       console.log("Data e Hora Selecionadas:", formattedDate);
+      atualizarServiceRecord(
+        id,
+        nome,
+        telefone,
+        service,
+        formattedDate
+      );
+      console.log(selectedDate);
+      setMsgError("");
+
       navigation.reset({
         index: 0,
         routes: [{ name: "Agendados" }],
       });
-    }else{
-      setMsgError("Digite todos os dados")
-    
+    } else {
+      setMsgError("Digite todos os dados");
+    }
   };
 
-  }
   return (
     <View style={styles.container}>
-
       <Text style={styles.title}>Yasmin Nails</Text>
       <View style={styles.formContainer}>
         <Text style={styles.notInfo}>{msgError}</Text>
@@ -73,7 +81,6 @@ const CadastroCliente = ({ navigation }) => {
           value={telefone}
           onChangeText={setTelefone}
           keyboardType="numeric"
-
         />
 
         <Text style={styles.label}>Serviço Desejado:</Text>
@@ -98,7 +105,8 @@ const CadastroCliente = ({ navigation }) => {
           onCancel={hideDateTimePicker}
         />
 
-        <Button title="Cadastrar" onPress={handleCadastro} />
+        <Button title="Editar" onPress={handleCadastro} />
+        <AntDesign/>
       </View>
     </View>
   );
@@ -107,42 +115,41 @@ const CadastroCliente = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: 'pink',
+    alignItems: "center",
+    backgroundColor: "pink",
   },
   formContainer: {
-
-    width: '90%',
-    backgroundColor: 'white',
+    width: "90%",
+    backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
   },
   title: {
     marginTop: 60,
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    color: 'white',
+    color: "white",
   },
   label: {
     fontSize: 18,
     marginBottom: 5,
-    color: 'pink',
+    color: "pink",
   },
   input: {
     borderWidth: 1,
-    borderColor: 'pink',
+    borderColor: "pink",
     borderRadius: 5,
     marginBottom: 10,
     padding: 8,
     fontSize: 16,
   },
   notInfo: {
-    color: 'red',
-    textAlign: 'center',
+    color: "red",
+    textAlign: "center",
     fontSize: 18,
     marginBottom: 16,
-  }
+  },
 });
 
-export default CadastroCliente;
+export default ReviwDetails;
