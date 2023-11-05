@@ -82,7 +82,7 @@ export const deletarServiceRecord = (id) => {
     console.log(id);
     db.transaction((tx) => {
       tx.executeSql(
-        "DELETE FROM serviceRecor WHERE id = ?",
+        "DELETE FROM serviceRecord WHERE id = ?",
         [id],
         (_, result) => resolve(result),
         (_, error) => reject(error)

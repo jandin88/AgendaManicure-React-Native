@@ -1,10 +1,20 @@
 import React, { useState } from "react";
-import { View, Text, Button, TextInput, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  Button,
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { format } from "date-fns";
-import { atualizarServiceRecord } from "../db/db";
+import { atualizarServiceRecord, deletarServiceRecord } from "../db/db";
 
-import { AntDesign } from "@expo/vector-icons"; 
+import { AntDesign  } from "@expo/vector-icons";
 
 const ReviwDetails = ({ navigation, route }) => {
   const [id, setId] = useState(route.params.id);
@@ -41,13 +51,7 @@ const ReviwDetails = ({ navigation, route }) => {
       console.log("Telefone:", telefone);
       console.log("Observação:", service);
       console.log("Data e Hora Selecionadas:", formattedDate);
-      atualizarServiceRecord(
-        id,
-        nome,
-        telefone,
-        service,
-        formattedDate
-      );
+      atualizarServiceRecord(id, nome, telefone, service, formattedDate);
       console.log(selectedDate);
       setMsgError("");
 
@@ -60,55 +64,91 @@ const ReviwDetails = ({ navigation, route }) => {
     }
   };
 
+  const exibirMensagemDeConfirmacao = () => {
+    Alert.alert(
+      "Alerta!",
+      "Você tem certeza de que deseja apagar esse registro?",
+      [
+        {
+          text: "Cancelar",
+          onPress: () => console.log("Ação cancelada"),
+          style: "cancel",
+        },
+        {
+          text: "Continuar",
+          onPress: () => {
+            // Coloque a ação que você deseja executar quando o usuário confirmar aqui
+            deletarServiceRecord(id);
+             navigation.reset({
+               index: 0,
+               routes: [{ name: "Agendados" }],
+             });
+            console.log("Ação confirmada");
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Yasmin Nails</Text>
-      <View style={styles.formContainer}>
-        <Text style={styles.notInfo}>{msgError}</Text>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+        // console.log("Teclado descartado");
+      }}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Yasmin Nails</Text>
 
-        <Text style={styles.label}>Nome:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Nome"
-          value={nome}
-          onChangeText={setNome}
-        />
-
-        <Text style={styles.label}>Telefone:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Telefone"
-          value={telefone}
-          onChangeText={setTelefone}
-          keyboardType="numeric"
-        />
-
-        <Text style={styles.label}>Serviço Desejado:</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Observação"
-          value={service}
-          onChangeText={setService}
-        />
-
-        <Text style={styles.label}>Selecionar Data e Hora</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Selecionar Data e Hora"
-          onFocus={showDateTimePicker}
-          value={formattedDate}
-        />
-        <DateTimePickerModal
-          isVisible={isDateTimePickerVisible}
-          mode="datetime"
-          onConfirm={handleDateConfirm}
-          onCancel={hideDateTimePicker}
-        />
-
-        <Button title="Editar" onPress={handleCadastro} />
-        <AntDesign/>
+        <View style={styles.formContainer}>
+          <Text style={styles.notInfo}>{msgError}</Text>
+          <Text style={styles.label}>Nome:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Nome"
+            value={nome}
+            onChangeText={setNome}
+          />
+          <Text style={styles.label}>Telefone:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Telefone"
+            value={telefone}
+            onChangeText={setTelefone}
+            keyboardType="numeric"
+          />
+          <Text style={styles.label}>Serviço Desejado:</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Observação"
+            value={service}
+            onChangeText={setService}
+          />
+          <Text style={styles.label}>Selecionar Data e Hora</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Selecionar Data e Hora"
+            onFocus={showDateTimePicker}
+            value={formattedDate}
+          />
+          <DateTimePickerModal
+            isVisible={isDateTimePickerVisible}
+            mode="datetime"
+            onConfirm={handleDateConfirm}
+            onCancel={hideDateTimePicker}
+          />
+          <Button title="Editar" onPress={handleCadastro} />
+        </View>
+        <TouchableOpacity cons onPress={() => exibirMensagemDeConfirmacao()}>
+          <Text style={styles.delete}>
+            Excluir da agenda{" "}
+            <AntDesign name="delete" size={30} color="white" />
+          </Text>
+        </TouchableOpacity>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -126,7 +166,17 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: 60,
-    fontSize: 24,
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "white",
+  },
+  delete: {
+    backgroundColor: "#ff4d4d",
+    padding: 5,
+    borderRadius: 6,
+    marginTop: 60,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 20,
     color: "white",
